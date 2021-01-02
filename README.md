@@ -7,9 +7,9 @@ IDEA Plugin for Android Studio: show activity stack ; send text to EditText.
 
 ## Usage
 
-* show activity stack (adb shell dumpsys activity activities)*
+* show activity stack (adb shell dumpsys activity activities)
 
-* make Android EditText in focus, enter text in plugin and click send button， text will be entered in android EditText *
+* make Android EditText in focus, enter text in plugin and click send button， text will be entered in android EditText 
 
 
 License
