@@ -1,0 +1,22 @@
+<idea-plugin>
+    <id>com.mxn.terrier</id>
+    <name>Terrier</name>
+    <vendor email="mxny21@gmail.com" url="https://github.com/mxn21/Terrier">mxn21</vendor>
+
+    <description><![CDATA[
+    View the stack of the Android Activity and jump to the code,you can also send text to EditText.
+    ]]></description>
+
+    <!-- 对IntelliJ IDEA软件支持本插件版本号 -->
+    <idea-version since-build="131"/>
+
+    <depends>org.jetbrains.android</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <defaultProjectTypeProvider type="Android"/>
+        <!-- secondary:true表示设置在tool window bar最下方 -->
+        <toolWindow id="Terrier" anchor="right" factoryClass="com.mxn.plugin.terrier.TerrierToolWindowFactory" />
+    </extensions>
+</idea-plugin>
