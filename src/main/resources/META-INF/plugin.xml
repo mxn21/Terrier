@@ -8,7 +8,7 @@
     ]]></description>
 
     <!-- 对IntelliJ IDEA软件支持本插件版本号 -->
-    <idea-version since-build="131"/>
+    <idea-version since-build="143"/>
 
     <depends>org.jetbrains.android</depends>
     <depends>org.jetbrains.kotlin</depends>

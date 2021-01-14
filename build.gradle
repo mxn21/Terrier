@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.mxn'
-version '1.0.8'
+version '1.0.9'
 
 repositories {
     mavenCentral()
@@ -24,6 +24,6 @@ intellij {
 
 patchPluginXml {
     changeNotes """
-      update description <br>
+      update idea-version since-build <br>
       """
 }
