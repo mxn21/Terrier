@@ -31,7 +31,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-import static com.mxn.plugin.terrier.ActivityStackCommand.RESUME_TAG;
+import static com.mxn.plugin.terrier.ActivityStackCommand.RESUME_ACTIVITY_TAG;
+import static com.mxn.plugin.terrier.ActivityStackCommand.RESUME_FRAGMENT_TAG;
 
 public class TerrierPanel extends SimpleToolWindowPanel implements DeviceService.DevicesListener, DeviceCellEditor.WatchListener {
 
@@ -109,7 +110,8 @@ public class TerrierPanel extends SimpleToolWindowPanel implements DeviceService
                         return;
                     }
                     if (pathForLocation.getPathCount() > 3 ||
-                            pathForLocation.getParentPath().toString().contains(RESUME_TAG)) {
+                            pathForLocation.getParentPath().toString().contains(RESUME_ACTIVITY_TAG) ||
+                            pathForLocation.getParentPath().toString().contains(RESUME_FRAGMENT_TAG)) {
                         tree.setSelectionPath(pathForLocation);
                         treePopup.show(tree, x, y);
                     }
@@ -267,8 +269,19 @@ public class TerrierPanel extends SimpleToolWindowPanel implements DeviceService
             });
             jumpItem.addActionListener(ae -> {
                 System.out.println("jumpItem actionPerformed");
-                String className = objectName.substring(objectName.lastIndexOf(".")+1);
-                System.out.println("className :" + className);
+                String className = null ;
+                boolean isFragment = false ;
+                if (objectName.contains("#")) {
+                    // fragment
+                    className = objectName.substring(0, objectName.indexOf("#"));
+                    System.out.println("className :" + className);
+                    isFragment = true ;
+                } else {
+                    // activity
+                    className = objectName.substring(objectName.lastIndexOf(".")+1);
+                    System.out.println("className :" + className);
+                }
+
                 String javaName = className + ".java" ;
                 String kotlinName = className + ".kt" ;
                 PsiFile[] javaFiles = PsiShortNamesCache.getInstance(project).getFilesByName(javaName) ;
@@ -279,11 +292,14 @@ public class TerrierPanel extends SimpleToolWindowPanel implements DeviceService
                         PsiJavaFile psiJavaFile = (PsiJavaFile) file;
                         String packageName = psiJavaFile.getPackageName() ;
                         VirtualFile vf = file.getViewProvider().getVirtualFile();
-                        String path = vf.getPath() ;
-                        String tempPath = packageName.replaceAll("\\.","/") + "/" + javaName;
-                        System.out.println("java tempPath1 :" + tempPath);
-                        if (path.contains(tempPath)) {
-                            System.out.println("java contains :" );
+                        if (isFragment) {
+                            // fragment不需要匹配包名
+                            System.out.println("java fragment contains" );
+                            openFile(vf) ;
+                            hasMatch = true ;
+                        } else if (objectName.contains(packageName)) {
+                            // activity 需要匹配包名
+                            System.out.println("java activity contains" );
                             openFile(vf) ;
                             hasMatch = true ;
                         }
@@ -294,11 +310,13 @@ public class TerrierPanel extends SimpleToolWindowPanel implements DeviceService
                         KtFile psiKtFile = (KtFile) file;
                         String packageName = psiKtFile.getPackageFqName().asString() ;
                         VirtualFile vf = file.getViewProvider().getVirtualFile();
-                        String path = vf.getPath() ;
-                        String tempPath = packageName.replaceAll("\\.","/") + "/" + kotlinName;
-                        System.out.println("kt tempPath2 :" + tempPath);
-                        if (path.contains(tempPath)) {
-                            System.out.println("kt contains :" );
+                        if (isFragment) {
+                            // fragment不需要匹配包名
+                            System.out.println("kt fragment contains" );
+                            openFile(vf) ;
+                            hasMatch = true ;
+                        } else if (objectName.contains(packageName)) {
+                            System.out.println("kt activity contains" );
                             openFile(vf) ;
                             hasMatch = true ;
                         }

@@ -34,22 +34,37 @@ import java.util.*;
 public class ActivityStackCommand {
     private static final List<DefaultMutableTreeNode> activityDumps = new ArrayList<>();
     private static final List<String> resumeActivities = new ArrayList<>();
+    private static final List<String> resumeFragments = new ArrayList<>();
     private static final Map<Integer, DefaultMutableTreeNode> nodes = new HashMap<>();
     private static DefaultMutableTreeNode currentNode;
     private static int currentDeep;
     private static boolean readOver = false;
-    public static final String RESUME_TAG= "Resume Activity" ;
+    private static boolean readFragmentOver = false;
+    public static final String RESUME_ACTIVITY_TAG= "Resume Activity" ;
+    public static final String RESUME_FRAGMENT_TAG= "Resume Fragment" ;
 
     public static List<DefaultMutableTreeNode> getActivityDumps2(IDevice device) {
         activityDumps.clear();
         resumeActivities.clear();
+        resumeFragments.clear();
         nodes.clear();
         readOver = false ;
+        readFragmentOver = false ;
         try {
-            device.executeShellCommand("dumpsys activity activities", new AndroidOutputReceiver() {
+            device.executeShellCommand("dumpsys activity top | grep mParent && echo ------- && dumpsys activity activities", new AndroidOutputReceiver() {
                 @Override
                 protected void processNewLine(@NotNull String line) {
-                    if (!line.equals("") && !readOver) {
+                    if (!readOver && !line.equals("")) {
+                        if (line.equals("-------")) {
+                            readFragmentOver = true ;
+                        }
+                        if (!readFragmentOver && line.contains("mParent=") && !line.contains("ReportFragment")) {
+                            String fragmentName = line.substring(line.indexOf("mParent=")+8,line.indexOf("{"));
+                            String fragmentId = line.substring(line.indexOf("{")+1,line.indexOf("}"));
+                            String activity = fragmentName + "#" + fragmentId ;
+                            resumeFragments.add(activity) ;
+                        }
+
                         if (line.contains("mResumedActivity:")) {
                             String activityRecord = line.substring(line.indexOf("{")+1,line.indexOf("}"));
                             String activity = activityRecord.split(" ")[2] ;
@@ -99,9 +114,16 @@ public class ActivityStackCommand {
         activityDumps.removeIf(node -> node.getChildCount() == 0);
         // 加入resume Activity
         if (resumeActivities.size() > 0 ) {
-            createTree(0,  RESUME_TAG) ;
+            createTree(0,  RESUME_ACTIVITY_TAG) ;
             for(String act :resumeActivities) {
                 createTree(1, act) ;
+            }
+        }
+        // 加入resume Fragment
+        if (resumeFragments.size() > 0 ) {
+            createTree(0,  RESUME_FRAGMENT_TAG) ;
+            for(String fragment :resumeFragments) {
+                createTree(1, fragment) ;
             }
         }
         return activityDumps;
