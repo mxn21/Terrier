@@ -16,7 +16,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <defaultProjectTypeProvider type="Android"/>
-        <!-- secondary:true表示设置在tool window bar最下方 -->
         <toolWindow id="Terrier" anchor="right" factoryClass="com.mxn.plugin.terrier.TerrierToolWindowFactory" />
     </extensions>
 </idea-plugin>

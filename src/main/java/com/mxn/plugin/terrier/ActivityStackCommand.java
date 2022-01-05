@@ -61,8 +61,8 @@ public class ActivityStackCommand {
                         if (!readFragmentOver && line.contains("mParent=") && !line.contains("ReportFragment")) {
                             String fragmentName = line.substring(line.indexOf("mParent=")+8,line.indexOf("{"));
                             String fragmentId = line.substring(line.indexOf("{")+1,line.indexOf("}"));
-                            String activity = fragmentName + "#" + fragmentId ;
-                            resumeFragments.add(activity) ;
+                            String fragmetValue = fragmentName + "#" + fragmentId ;
+                            resumeFragments.add(fragmetValue) ;
                         }
 
                         if (line.contains("mResumedActivity:")) {
@@ -70,7 +70,8 @@ public class ActivityStackCommand {
                             String activity = activityRecord.split(" ")[2] ;
                             resumeActivities.add(activity) ;
                         }
-                        if (line.contains("Stack #") && line.contains(":")) {
+                        // android 12用RootTask判断
+                        if ((line.contains("Stack #") || line.contains("RootTask #")) && line.contains(":")) {
                             String stack = line.split(":")[0] ;
                             createTree(0, stack) ;
                         }
@@ -96,7 +97,7 @@ public class ActivityStackCommand {
                                 createTree(2,  activity) ;
                             }
                         }
-                        if (line.contains("ActivityStackSupervisor")) {
+                        if (line.contains("ActivityStackSupervisor") || line.contains("ActivityTaskSupervisor")) {
                             readOver = true ;
                         }
                     }
@@ -107,7 +108,7 @@ public class ActivityStackCommand {
                     return false;
                 }
             });
-        } catch (TimeoutException | AdbCommandRejectedException | ShellCommandUnresponsiveException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // 删除空的stack

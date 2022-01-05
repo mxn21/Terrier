@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.mxn'
-version '1.1.0'
+version '1.1.1'
 
 repositories {
     mavenCentral()
@@ -24,6 +24,6 @@ intellij {
 
 patchPluginXml {
     changeNotes """
-      Support current fagment presentation <br>
+      Support android 12 <br>
       """
 }
